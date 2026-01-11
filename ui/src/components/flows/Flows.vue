@@ -1,39 +1,33 @@
 <template>
     <TopNavBar v-if="topbar" :title="routeInfo.title">
         <template #additional-right>
-            <ul class="header-actions-list">
-                <li>
-                    <el-button v-if="canRead" :icon="Download" @click="exportFlowsAsStream()">
-                        {{ $t('export_csv') }}
-                    </el-button>
-                </li>
-                <li>
-                    <el-button :icon="Upload" @click="file?.click()">
-                        {{ $t("import") }}
-                    </el-button>
-                    <input ref="file" type="file" accept=".zip, .yml, .yaml" @change="importFlows()" class="d-none">
-                </li>
-                <li>
-                    <router-link :to="{name: 'flows/search'}">
-                        <el-button :icon="TextBoxSearch">
+            <div class="d-flex align-items-center gap-2">
+                <HamburgerDropdown v-if="canRead || canCreate">
+                    <template #default>
+                        <el-dropdown-item v-if="canRead" :icon="Download" @click="exportFlowsAsStream()">
+                            {{ $t('export_csv') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item :icon="Upload" @click="file?.click()">
+                            {{ $t("import") }}
+                        </el-dropdown-item>
+                        <el-dropdown-item :icon="TextBoxSearch" @click="$router.push({name: 'flows/search'})">
                             {{ $t("source search") }}
-                        </el-button>
-                    </router-link>
-                </li>
-                <li>
-                    <router-link
-                        :to="{
-                            name: 'flows/create',
-                            query: {namespace: $route.query.namespace},
-                        }"
-                        v-if="canCreate"
-                    >
-                        <el-button :icon="Plus" type="primary">
-                            {{ $t("create") }}
-                        </el-button>
-                    </router-link>
-                </li>
-            </ul>
+                        </el-dropdown-item>
+                    </template>
+                </HamburgerDropdown>
+                <input ref="file" type="file" accept=".zip, .yml, .yaml" @change="importFlows()" class="d-none">
+                <router-link
+                    :to="{
+                        name: 'flows/create',
+                        query: {namespace: $route.query.namespace},
+                    }"
+                    v-if="canCreate"
+                >
+                    <el-button :icon="Plus" type="primary">
+                        {{ $t("create") }}
+                    </el-button>
+                </router-link>
+            </div>
         </template>
     </TopNavBar>
     <section :class="{container: topbar}" v-if="ready">
@@ -305,6 +299,7 @@
     import MarkdownTooltip from "../layout/MarkdownTooltip.vue";
     import TimeSeries from "../dashboard/sections/TimeSeries.vue";
     import TopNavBar from "../../components/layout/TopNavBar.vue";
+    import HamburgerDropdown from "../HamburgerDropdown.vue";
 
     import action from "../../models/action";
     import permission from "../../models/permission";
@@ -698,18 +693,6 @@
 
 :deep(.flows-table) .el-scrollbar__thumb {
     background-color: var(--ks-border-active) !important;
-}
-.header-actions-list {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    gap: 0.5rem;
-
-    @media (max-width: 570px) {
-        flex-direction: column;
-        align-items: flex-end;
-    }
 }
 
 .table-link {

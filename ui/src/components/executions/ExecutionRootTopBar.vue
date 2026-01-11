@@ -7,28 +7,13 @@
         <template #additional-right>
             <slot name="additional-right" />
             <div class="d-flex align-items-center gap-2" v-if="(isAllowedEdit || isAllowedTrigger) && $route.params.tab !== 'audit-logs'">
-                <ul class="d-none d-xl-flex align-items-center">
-                    <li v-if="isAllowedEdit">
-                        <el-button :icon="Pencil" @click="editFlow">
+                <HamburgerDropdown v-if="isAllowedEdit">
+                    <template #default>
+                        <el-dropdown-item :icon="Pencil" @click="editFlow">
                             {{ $t("edit flow") }}
-                        </el-button>
-                    </li>
-                </ul>
-    
-                <el-dropdown class="d-flex d-xl-none align-items-center">
-                    <el-button>
-                        <el-icon><DotsVerticalIcon /></el-icon>
-                        <span class="d-none d-lg-inline-block">{{ $t("more_actions") }}</span>
-                    </el-button>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item v-if="isAllowedEdit" @click="editFlow">
-                                <el-icon><Pencil /></el-icon>
-                                {{ $t("edit flow") }}
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
+                        </el-dropdown-item>
                     </template>
-                </el-dropdown>
+                </HamburgerDropdown>
     
                 <div v-if="isAllowedTrigger">
                     <TriggerFlow
@@ -44,8 +29,8 @@
 
 <script setup>
     import Pencil from "vue-material-design-icons/Pencil.vue";
-    import DotsVerticalIcon from "vue-material-design-icons/DotsVertical.vue";
     import Badge from "../global/Badge.vue";
+    import HamburgerDropdown from "../HamburgerDropdown.vue";
 </script>
 
 <script>

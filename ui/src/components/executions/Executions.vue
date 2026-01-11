@@ -1,37 +1,27 @@
 <template>
     <TopNavBar v-if="topbar" :title="routeInfo.title">
         <template #additional-right v-if="displayButtons">
-            <ul>
-                <template v-if="$route.name === 'executions/list'">
-                    <li>
-                        <el-button :icon="Download" @click="exportExecutionsAsStream()">
+            <div class="d-flex align-items-center gap-2">
+                <HamburgerDropdown v-if="($route.name === 'executions/list') || (isAllowedEdit && $route.name === 'flows/update')">
+                    <template #default>
+                        <el-dropdown-item v-if="$route.name === 'executions/list'" :icon="Download" @click="exportExecutionsAsStream()">
                             {{ $t('export_csv') }}
-                        </el-button>
-                    </li>
-                    <li>
-                        <template v-if="hasAnyExecute">
-                            <TriggerFlow />
-                        </template>
-                    </li>
+                        </el-dropdown-item>
+                        <el-dropdown-item v-if="isAllowedEdit && $route.name === 'flows/update'" :icon="Pencil" @click="editFlow" :disabled="isReadOnly">
+                            {{ $t("edit flow") }}
+                        </el-dropdown-item>
+                    </template>
+                </HamburgerDropdown>
+                <template v-if="$route.name === 'executions/list' && hasAnyExecute">
+                    <TriggerFlow />
                 </template>
-                <template v-if="$route.name === 'flows/update'">
-                    <li>
-                        <template v-if="isAllowedEdit">
-                            <el-button :icon="Pencil" size="large" @click="editFlow" :disabled="isReadOnly">
-                                {{ $t("edit flow") }}
-                            </el-button>
-                        </template>
-                    </li>
-                    <li>
-                        <TriggerFlow
-                            v-if="flowStore.flow"
-                            :disabled="flowStore.flow?.disabled || isReadOnly"
-                            :flowId="flowStore.flow?.id"
-                            :namespace="flowStore.flow?.namespace"
-                        />
-                    </li>
-                </template>
-            </ul>
+                <TriggerFlow
+                    v-else-if="$route.name === 'flows/update' && flowStore.flow"
+                    :disabled="flowStore.flow?.disabled || isReadOnly"
+                    :flowId="flowStore.flow?.id"
+                    :namespace="flowStore.flow?.namespace"
+                />
+            </div>
         </template>
     </TopNavBar>
     <section :class="{'container padding-bottom': topbar}" v-if="ready">
@@ -420,6 +410,7 @@
     import Sections from "../dashboard/sections/Sections.vue";
     import TopNavBar from "../../components/layout/TopNavBar.vue";
     import LabelInput from "../../components/labels/LabelInput.vue";
+    import HamburgerDropdown from "../HamburgerDropdown.vue";
     //@ts-expect-error no declaration file
     import TriggerFlow from "../../components/flows/TriggerFlow.vue";
     import TriggerAvatar from "../../components/flows/TriggerAvatar.vue";
